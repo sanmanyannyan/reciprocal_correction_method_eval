@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-O3 -mfpu=neon -march=native
+CFLAGS=-O3 -march=native -mtune=cortex-a72
 LDFLAGS=-lm
 
 run:div

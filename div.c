@@ -106,6 +106,7 @@ int main(int argc,char *argv[]){
 	// div0
 	max_reldif = 0.0;
 	maxIdx = 0;
+	true_val = est_val = 0.f;
 	for(int i=0 ; i<n ; i+= vector_length){
 		float32x4_t vx = vld1q_f32(x + i);
 		float32x4_t vy = vld1q_f32(y + i);
@@ -157,6 +158,7 @@ int main(int argc,char *argv[]){
 	// div2
 	max_reldif = 0.0;
 	maxIdx = 0;
+	true_val = est_val = 0.f;
 	for(int i=0 ; i<n ; i+= vector_length){
 		float32x4_t vx = vld1q_f32(x + i);
 		float32x4_t vy = vld1q_f32(y + i);
@@ -208,6 +210,7 @@ int main(int argc,char *argv[]){
 	// div3
 	max_reldif = 0.0;
 	maxIdx = 0;
+	true_val = est_val = 0.f;
 	for(int i=0 ; i<n ; i+= vector_length){
 		float32x4_t vx = vld1q_f32(x + i);
 		float32x4_t vy = vld1q_f32(y + i);
@@ -259,6 +262,7 @@ int main(int argc,char *argv[]){
 	// div4
 	max_reldif = 0.0;
 	maxIdx = 0;
+	true_val = est_val = 0.f;
 	for(int i=0 ; i<n ; i+= vector_length){
 		float32x4_t vx = vld1q_f32(x + i);
 		float32x4_t vy = vld1q_f32(y + i);
@@ -310,6 +314,7 @@ int main(int argc,char *argv[]){
 	// div8
 	max_reldif = 0.0;
 	maxIdx = 0;
+	true_val = est_val = 0.f;
 	for(int i=0 ; i<n ; i+= vector_length){
 		float32x4_t vx = vld1q_f32(x + i);
 		float32x4_t vy = vld1q_f32(y + i);
@@ -350,6 +355,58 @@ int main(int argc,char *argv[]){
 		}
 	}
 	printf("div8\n");
+	printf("\tmax relative difference:%E\n",max_reldif);
+	printf("\ttrue value:%E = 1 / %f\n", true_val, y[maxIdx]);
+	printf("\t est value:%E\n", est_val);
+	printf("\ttrue value:");
+	print_float_bits(true_val);
+	printf("\t est value:");
+	print_float_bits(est_val);
+	
+	// standard div
+	max_reldif = 0.0;
+	maxIdx = 0;
+	true_val = est_val = 0.f;
+	for(int i=0 ; i<n ; i+= vector_length){
+		float32x4_t vx = vld1q_f32(x + i);
+		float32x4_t vy = vld1q_f32(y + i);
+		float32x4_t vz = vdivq_f32(vx, vy);
+		vst1q_f32(destE + i, vz);
+		destO[i + 0] = x[i + 0] / y[i + 0]; 
+		destO[i + 1] = x[i + 1] / y[i + 1]; 
+		destO[i + 2] = x[i + 2] / y[i + 2]; 
+		destO[i + 3] = x[i + 3] / y[i + 3]; 
+		
+		reldif = fabs((destE[i + 0] - destO[i + 0]) / destO[i + 0]);
+		if( reldif > max_reldif ){
+			max_reldif = reldif;
+			true_val = destO[i + 0];
+			est_val = destE[i + 0];
+			maxIdx = i;
+		}
+		reldif = fabs((destE[i + 1] - destO[i + 1]) / destO[i + 1]);
+		if( reldif > max_reldif ){
+			max_reldif = reldif;
+			true_val = destO[i + 1];
+			est_val = destE[i + 1];
+			maxIdx = i + 1;
+		}
+		reldif = fabs((destE[i + 2] - destO[i + 2]) / destO[i + 2]);
+		if( reldif > max_reldif ){
+			max_reldif = reldif;
+			true_val = destO[i + 2];
+			est_val = destE[i + 2];
+			maxIdx = i + 2;
+		}
+		reldif = fabs((destE[i + 3] - destO[i + 3]) / destO[i + 3]);
+		if( reldif > max_reldif ){
+			max_reldif = reldif;
+			true_val = destO[i + 3];
+			est_val = destE[i + 3];
+			maxIdx = i + 3;
+		}
+	}
+	printf("standard div\n");
 	printf("\tmax relative difference:%E\n",max_reldif);
 	printf("\ttrue value:%E = 1 / %f\n", true_val, y[maxIdx]);
 	printf("\t est value:%E\n", est_val);
